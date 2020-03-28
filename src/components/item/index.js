@@ -40,6 +40,7 @@ export default class DropdownItem extends PureComponent {
         {...props}
         labelStyle={{ paddingTop: 2, margin: 0}}
         style={[styles.container, style]}
+        activeOpacity={0.6}
         onPress={this.onPress}
       >
         {children}
