@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
-import { Button } from 'react-native-paper';
+import { TouchableOpacity } from 'react-native';
 
 import styles from './styles';
 
@@ -36,15 +36,14 @@ export default class DropdownItem extends PureComponent {
     let { children, style, index, ...props } = this.props;    
 
     return (
-      <Button
+      <TouchableOpacity
         {...props}
-        mode='text'
         labelStyle={{ paddingTop: 2, margin: 0}}
         style={[styles.container, style]}
         onPress={this.onPress}
       >
         {children}
-      </Button>
+      </TouchableOpacity>
     );
   }
 }
