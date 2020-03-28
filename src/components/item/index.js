@@ -13,7 +13,7 @@ export default class DropdownItem extends PureComponent {
   };
 
   static propTypes = {
-    ...Button.propTypes,
+    ...TouchableOpacity.propTypes,
 
     index: PropTypes.number.isRequired,
   };
