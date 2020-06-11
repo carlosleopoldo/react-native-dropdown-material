@@ -13,7 +13,7 @@ import {
   I18nManager,
 } from "react-native";
 import Ripple from "react-native-material-ripple";
-import { TextInput } from "react-native-paper";
+import { TextField } from "react-native-material-textfield";
 
 import DropdownItem from "../item";
 import styles from "./styles";
@@ -28,6 +28,8 @@ export default class Dropdown extends PureComponent {
 
     valueExtractor: ({ value } = {}, index) => value,
     labelExtractor: ({ label } = {}, index) => label,
+    displayTextExtractor: ({ label, displayText } = {}, index) =>
+      displayText || label,
     propsExtractor: () => null,
 
     absoluteRTLLayout: false,
@@ -143,7 +145,6 @@ export default class Dropdown extends PureComponent {
     renderBase: PropTypes.func,
     renderAccessory: PropTypes.func,
 
-    labelContainerStyle: (ViewPropTypes || View.propTypes).style,
     containerStyle: (ViewPropTypes || View.propTypes).style,
     overlayStyle: (ViewPropTypes || View.propTypes).style,
     pickerStyle: (ViewPropTypes || View.propTypes).style,
@@ -188,9 +189,9 @@ export default class Dropdown extends PureComponent {
 
   componentDidUpdate(prevProps, prevState) {
     if (prevProps.value !== this.props.value) {
-      this.txRef.current.value = this.props.value;
+      this.txRef.current.setValue(this.props.value);
     } else if (prevState.value !== this.state.value) {
-      this.txRef.current.value = this.state.value;
+      this.txRef.current.setValue(this.state.value);
     }
   }
 
@@ -349,7 +350,8 @@ export default class Dropdown extends PureComponent {
       onChangeText(value, index, data);
     }
 
-    setTimeout(() => this.onClose(value), delay);
+    const isItemDisabled = data[index].disabled;
+    setTimeout(() => this.onClose(!isItemDisabled ? value : undefined), delay);
   }
 
   onLayout(event) {
@@ -496,15 +498,16 @@ export default class Dropdown extends PureComponent {
     title = null == title || "string" === typeof title ? title : String(title);
 
     return (
-      <TextInput
+      <TextField
         ref={this.txRef}
-        style={{ backgroundColor: "transparent", marginBottom: 16 }}
         label=""
+        labelHeight={
+          dropdownOffset.top - Platform.select({ ios: 1, android: 2 })
+        }
         {...props}
-        value={title}
         editable={false}
         onChangeText={undefined}
-        renderAccessory={renderAccessory}
+        renderRightAccessory={renderAccessory}
       />
     );
   }
@@ -562,7 +565,7 @@ export default class Dropdown extends PureComponent {
 
     let {
       valueExtractor,
-      labelExtractor,
+      displayTextExtractor,
       propsExtractor,
       textColor,
       itemColor,
@@ -579,7 +582,7 @@ export default class Dropdown extends PureComponent {
     let props = propsExtractor(item, index);
 
     let { style, disabled } = (props = {
-      rippleDuration,
+      rippleDuration: item.disabled ? 0 : rippleDuration,
       rippleOpacity,
       rippleColor: baseColor,
 
@@ -588,15 +591,16 @@ export default class Dropdown extends PureComponent {
 
       ...props,
 
-      onPress: this.onSelect,
+      onPress: item.disabled ? null : this.onSelect,
     });
 
     let value = valueExtractor(item, index);
-    let label = labelExtractor(item, index);
+    let displayText = displayTextExtractor(item, index);
+    const isItemDisabled = item.disabled;
 
-    let title = null == label ? value : label;
+    let title = null == displayText ? value : displayText;
 
-    let color = disabled
+    let color = isItemDisabled
       ? disabledItemColor
       : ~selected
       ? index === selected
@@ -629,7 +633,6 @@ export default class Dropdown extends PureComponent {
       renderBase,
       renderAccessory,
       containerStyle,
-      labelContainerStyle,
       overlayStyle: overlayStyleOverrides,
       pickerStyle: pickerStyleOverrides,
 
