@@ -187,11 +187,13 @@ export default class Dropdown extends PureComponent {
     };
   }
 
+  txRef = React.createRef();
+
   componentDidUpdate(prevProps, prevState) {
     if (prevProps.value !== this.props.value) {
-      this.txRef.current.setValue(this.props.value);
+      this.txRef.current = this.props.value;
     } else if (prevState.value !== this.state.value) {
-      this.txRef.current.setValue(this.state.value);
+      this.txRef.current = this.state.value;
     }
   }
 
@@ -467,8 +469,6 @@ export default class Dropdown extends PureComponent {
 
     return `${index}-${valueExtractor(item, index)}`;
   }
-
-  txRef = React.createRef();
 
   renderBase(props) {
     let { value } = this.state;
